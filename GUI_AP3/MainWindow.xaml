@@ -18,13 +18,12 @@
                 <MenuItem Header="Email us" Click="Email_Click"/>
             </MenuItem>
         </Menu>
-        <ProgressBar DockPanel.Dock="Bottom" Height="8"/>
+        <ProgressBar  DockPanel.Dock="Bottom" Height="8"/>
         <Grid DockPanel.Dock="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="3*"/>
+                <RowDefinition Height="4*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -35,7 +34,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" BorderBrush="Black"  BorderThickness="1" CornerRadius="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Grid.Column="0" Background="Thistle"  BorderThickness="1" CornerRadius="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Label Content="Type of input file" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Label.ToolTip>
                             <StackPanel>
@@ -49,20 +48,21 @@
                     <ComboBoxItem  IsSelected="True">ProteinsFasta</ComboBoxItem>
                     <ComboBoxItem >PeptideSequences</ComboBoxItem>
                 </ComboBox>
-                <Border Grid.Column="2" BorderBrush="Black" CornerRadius="10,10,10,10" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Label Content="Species"  HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Grid.Column="2" Background="Thistle"  CornerRadius="10,10,10,10" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Label Content="Model"  HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Label.ToolTip>
                             <StackPanel>
-                                <TextBlock>Please choose the corresponding species of the input file.</TextBlock>
+                                <TextBlock>Please choose the trained model according to the input.</TextBlock>
                             </StackPanel>
                         </Label.ToolTip>
                     </Label>
                 </Border>
-                <ComboBox Name="SpeciesComboBox" Grid.Column="3" SelectedValuePath="Content"
+                <ComboBox Name="SpeciesComboBox" Grid.Column="3" 
                           HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <ComboBoxItem IsSelected="True" >Mouse</ComboBoxItem>
-                    <ComboBoxItem   >Human</ComboBoxItem>
-                    <ComboBoxItem >Ecoli</ComboBoxItem>
+                    <ComboBoxItem IsSelected="True" FontStyle="Italic" >Saccharomyces cerevisiae</ComboBoxItem>
+                    <ComboBoxItem FontStyle="Italic" >Mus</ComboBoxItem>
+                    <ComboBoxItem  FontStyle="Italic" >Homo sapiens</ComboBoxItem>
+                    <ComboBoxItem FontStyle="Italic" >E.coli</ComboBoxItem>
                     <ComboBoxItem >Mix</ComboBoxItem>
                 </ComboBox>
             </Grid>
@@ -73,7 +73,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" CornerRadius="10,10,10,10"
+                <Border Grid.Column="0" Background="Thistle"  BorderThickness="1" CornerRadius="10,10,10,10"
                         HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Label Content="Identifier parsing rule" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Label.ToolTip>
@@ -87,56 +87,71 @@
                          HorizontalAlignment="Center" VerticalAlignment="Center" 
                          MinWidth="100" MinHeight="28" Margin="0,4,0,4" TextWrapping="Wrap">
                 </TextBox>
-                <Button Name="TestRuleButton" Content="Test" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button Name="TestRuleButton" Content="Test" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Click="TestRuleButton_Click">
                 </Button>
             </Grid>
-
+            <GroupBox Grid.Row="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <!--Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" CornerRadius="10,10,10,10"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"-->
+                   
+ 
+                 </Grid>
+            </GroupBox>
+            
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1.1*"/>
-                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" CornerRadius="10,10,10,10" 
-                        HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Label Content="Input file" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Label.ToolTip>
-                            <StackPanel>
-                                <TextBlock>The absolute path of the input file.</TextBlock>
-                            </StackPanel>
-                        </Label.ToolTip>
-                    </Label>
-                </Border>
-                
-                <TextBox Name="InputfileTextBox" Grid.Column="1" BorderBrush="Black" BorderThickness="1"
-                         TextWrapping="Wrap" MinWidth="200" VerticalAlignment="Center"  MinHeight="30" Margin="13,4,10,2"/>
-            </Grid>
-            <Grid Grid.Row="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2.1*"/>
-                    <ColumnDefinition Width="2*"/>
-                </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Header="Part(or All) input sequences">
+               
+                    <GroupBox Grid.Column="0" Header="Input">
                     <GroupBox.ToolTip>
                         <StackPanel>
                             <TextBlock TextWrapping="Wrap">It will show all input sequences if the number of proteins or peptides is less than 10, otherwise it will show the first 10 samples. 
                                 The user can also paste the sequences into this textbox directly.</TextBlock>
                         </StackPanel>
                     </GroupBox.ToolTip>
-                    <TextBox Name="InputContentTextBox" BorderBrush="Black" BorderThickness="1" TextWrapping="Wrap"
+                    <DockPanel >
+                        <CheckBox Name="FollowSequencesCheckbox" DockPanel.Dock="Top" Content="Just input the following sequences" Margin="10,2,3,2"
+                                HorizontalAlignment="Left" 
+                            VerticalAlignment="Center"  Click="FollowSequencesCheckbox_click" >
+
+                        </CheckBox>
+                        <CheckBox Name="FileInputCheckbox" DockPanel.Dock="Top" Content="Load input from the following file" Margin="10,2,3,2"
+                                HorizontalAlignment="Left"  VerticalAlignment="Center"  Click="FileInputCheckbox_click" >
+                        </CheckBox>
+                        <DockPanel DockPanel.Dock="Top">
+                            <Button  x:Name="InputDirectory_Browse" Content="Browse" DockPanel.Dock="Left" HorizontalAlignment="Left"  
+                                 VerticalAlignment="Center" Click="InputDirectory_Browse_Click" Margin="10,0,0,0"/>
+                            <TextBox Name="InputFilePathTextBox" BorderBrush="Black" BorderThickness="1" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="3,0,0,0"
+                             AcceptsReturn="True"/>
+                        </DockPanel>
+                        
+
+                        <TextBox Name="InputTextBox" BorderBrush="Black" BorderThickness="1" TextWrapping="Wrap"
                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                              AcceptsReturn="True"/>
+                    </DockPanel>
                 </GroupBox>
+               
                 <GroupBox Grid.Column="1" Header="In-silico digestion">
                     <Grid >
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2*"/>
-                            <RowDefinition Height="*"/>    
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
-                        <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1" CornerRadius="10,10,10,10"
+                        <Border Grid.Row="0" Grid.Column="0" Background="Thistle"  BorderThickness="1" CornerRadius="10,10,10,10"
                                 VerticalAlignment="Center" HorizontalAlignment="Center">
                             <Label>
                                 <TextBlock TextWrapping="Wrap">Maximum number of missed cleavage sites</TextBlock>
@@ -146,33 +161,32 @@
                                  HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"
                                  BorderBrush="Black" BorderThickness="1">                            
                         </TextBox>
-                        <Border Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="1"
+                        <Border Grid.Row="1" Grid.Column="0" Background="Thistle"  BorderThickness="1"
                                 CornerRadius="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Label Content="Peptide length"/>
+                            <Label Content="Maximum peptide length"/>
                         </Border>
-                        <DockPanel Grid.Row="1" Grid.Column="1" 
-                                   HorizontalAlignment="Center" >
-                            <TextBox Name="MinPepLength" HorizontalAlignment="Center" MinHeight="28" MinWidth="28"
-                                     VerticalAlignment="Center" FontSize="16" Text="7"
-                                     BorderBrush="Black" BorderThickness="1"/>
-                            <Label HorizontalAlignment="left" VerticalAlignment="Center">
-                                <Rectangle  Fill="Black" Width="25" Height="2" HorizontalAlignment="Center">
-                                </Rectangle>
-                            </Label>
-                            <TextBox Name="MaxPepLength" HorizontalAlignment="Left" MinHeight="28" MinWidth="28"
+                        <TextBox Name="MaxPepLength" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" MinHeight="28" MinWidth="28"
                                      VerticalAlignment="Center" FontSize="16" Text="40"
                                      BorderBrush="Black" BorderThickness="1"/>
-                        </DockPanel>
+                        <Border Grid.Row="2" Grid.Column="0" Background="Thistle"  BorderThickness="1"
+                                CornerRadius="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Label Content="Maximum peptide length"/>
+                        </Border>
+                        <TextBox Name="MinPepLength" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" MinHeight="28" MinWidth="28"
+                                     VerticalAlignment="Center" FontSize="16" Text="7"
+                                     BorderBrush="Black" BorderThickness="1"/>
+
+
 
                     </Grid>
                 </GroupBox>
             </Grid>
-            <Grid Grid.Row="4">
+            <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1.1*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" CornerRadius="10,10,10,10" 
+                <Border Grid.Column="0" Background="Thistle"  BorderThickness="1" CornerRadius="10,10,10,10" 
                         HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Label Content="Result directory" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
@@ -180,8 +194,8 @@
                          TextWrapping="Wrap" VerticalAlignment="Center" MinHeight="30" MinWidth="200" Margin="13,4,10,2"/>
             </Grid>
             <DockPanel Grid.Row="5">
-                <Button Name="RunButton" Content="Run" HorizontalAlignment="Center" VerticalAlignment="Center">
-                </Button>
+                <Button Name="AP3RunButton" Content="Run" HorizontalAlignment="Center" VerticalAlignment="Center" Click="AP3RunButton_click"/>
+
             </DockPanel>
         </Grid>
         
