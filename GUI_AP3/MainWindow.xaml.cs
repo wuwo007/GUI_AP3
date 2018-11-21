@@ -16,6 +16,13 @@ using System.IO;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using System.Diagnostics;
+using System.Net.Mail;
+using System.ComponentModel;
+
+using System.Threading;
+using System.Runtime.InteropServices;
+using Microsoft.Win32;
+using System.Collections;
 
 namespace GUI_AP3
 {
@@ -26,15 +33,49 @@ namespace GUI_AP3
     /// </summary>
     public partial class MainWindow : Window
     {
-        private bool bIfAP3Running;
+        private bool bIfAP3Running=false;
         private delegate void ChangeStatusBar(String arg);
         private delegate void DelegateShowError();
+        private delegate void ChangeParamIsEnable();
+
+        [DllImport("Kernel32.dll")]
+        public static extern IntPtr LoadLibrary(string lpFileName);
 
         Process AP3Process = new Process();
-
+        bool bIfRunAP3;
         public MainWindow()
         {
             InitializeComponent();
+            bIfRunAP3 = false;
+            SpeciesComboBox.SelectedIndex = 0;
+            this.Closing += ClosingApplication;
+
+        }
+        private void ClosingApplication(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                MessageBoxResult result = System.Windows.MessageBox.Show("Are you sure to exit？", "Closing", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                //Close the windown
+                if (result == MessageBoxResult.Yes)
+                {
+                    KillProcesses();
+                    e.Cancel = false;
+                }
+                //cancel the decision to close the window
+                if (result == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (NotImplementedException nie)
+            {
+                //throw new NotImplementedException();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+            }
 
         }
 
@@ -62,52 +103,107 @@ namespace GUI_AP3
 
         private void FileExit_Click(object sender, RoutedEventArgs e)
         {
-
+            KillProcesses();
+            this.Close();
         }
 
+        public int KillProcesses()
+        {
+            try
+            {
+                if (bIfRunAP3)
+                {
+                    if (!AP3Process.HasExited)
+                        AP3Process.Kill();
+                }
+
+            }
+            catch (NullReferenceException nre)
+            {
+
+            }
+
+            return 0;
+        }
         private void InitialTest_Click(object sender, RoutedEventArgs e)
         {
 
+            if (!IfExistInEnvironmentPath("mclmcrrt8_3.dll"))
+            {
+                System.Windows.MessageBox.Show("Please intall and configurate the Matlab Runtime 8.3 before running AP3!");
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("The Matlab Runtime 8.3 has been installed.");
+            }
+
         }
+
+
+        public bool IfExistInEnvironmentPath(string DllName)
+        {
+            if(File.Exists(DllName))
+            {
+                return true;
+            }
+            else
+            {
+                string pathlist=string.Empty;
+                string DllFullPath;
+                
+                foreach (DictionaryEntry de in Environment.GetEnvironmentVariables())
+                {
+                    if (de.Key.ToString() == "PATH" || de.Key.ToString() == "Path")
+                        pathlist = de.Value.ToString();
+                }
+                
+                //检测是否以;结尾
+                if (pathlist.Substring(pathlist.Length - 1, 1) != ";")
+                {
+                    pathlist = pathlist + ";";
+                }
+                string[] list = pathlist.Split(';');
+
+                foreach (string item in list)
+                {
+                    DllFullPath = item + "\\" + DllName;
+                    if (File.Exists(DllFullPath))
+                        return true;
+                }
+            }
+                
+            return false;
+        }
+       
 
         private void About_Click(object sender, RoutedEventArgs e)
         {
-
+            string strAboutAP3 = "AP3 Version: v1.0.0\nAP3 is an improved proteotypic peptide prediction tool by taking the protein proteolytic digestion process into consideration.";
+            System.Windows.MessageBox.Show(strAboutAP3);
         }
 
         private void Online_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                System.Diagnostics.Process.Start("http://fugroup.amss.ac.cn/software/AP3/AP3.html");
+            }
+            catch
+            {
+            }
+     
 
         }
 
         private void Email_Click(object sender, RoutedEventArgs e)
         {
+            string strEmails = "Yan Fu: yfu@amss.ac.cn \nAcademy of Mathematics and Systems Science, Chinese Academy of Sciences, Beijing 100049, China.\n" +
+                "Yunping Zhu: zhuyunping@gmail.com\nBeijing Proteome Research Center, National Center for Protein Sciences (Beijing), Beijing Institute of Lifeomics, Beijing 102206, China.";
+            System.Windows.Forms.MessageBox.Show(strEmails);
 
         }
-
-        private void InputTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBoxItem InputTypeItem = ((sender as System.Windows.Controls.ComboBox).SelectedItem as ComboBoxItem);
-
-            if(InputTypeItem.Content==null){}
-            else if(InputTypeItem.Content.ToString()=="PeptideSequences")
-            {
-                ParseRuleTextBox.IsEnabled = false;
-                TestRuleButton.IsEnabled = false;
-                MaxMissCleavage.IsEnabled = false;
-                MinPepLength.IsEnabled = false;
-                MaxPepLength.IsEnabled = false;
-            }
-            else if (InputTypeItem.Content.ToString() == "ProteinsFasta")
-            {
-                ParseRuleTextBox.IsEnabled = true;
-                TestRuleButton.IsEnabled = true;
-                MaxMissCleavage.IsEnabled = true;
-                MinPepLength.IsEnabled = true;
-                MaxPepLength.IsEnabled = true;
-            }
-
-        }
+      
+        
 
         public void LoadParameters(string parametersPath)
         {
@@ -131,16 +227,7 @@ namespace GUI_AP3
                     iStartLoc = strLine.IndexOf("\"");
                     iEndLoc = strLine.LastIndexOf("\"");
                     strTemp2 = strLine.Substring(iStartLoc + 1, iEndLoc - iStartLoc - 1);
-                    if (strTemp1 == "InputFileType")
-                    {
-                        if (strTemp2 == "ProteinsFasta")
-                            InputTypeComboBox.SelectedIndex = 0;
-                        else if (strTemp2 == "PeptideSequences")
-                            InputTypeComboBox.SelectedIndex = 1;
-                        else
-                            System.Windows.MessageBox.Show("Cannot read the InputFileType in the parameter file.");
-                    }
-                    if (strTemp1 == "InputFilePath")
+                   if (strTemp1 == "InputFilePath")
                     {
                         InputFilePathTextBox.Text = strTemp2;
                     }
@@ -197,39 +284,25 @@ namespace GUI_AP3
             try
             {
                 StreamReader sReader = new StreamReader(InputFilePath, Encoding.Default);
-                ComboBoxItem cbItem = (InputTypeComboBox.SelectedItem as ComboBoxItem);
-
-                if (cbItem.Content.ToString() == "PeptideSequences")
+                int iProteins = 0;
+                string strLine = sReader.ReadLine();
+                while (strLine!=null && iLine < iReadLines)
                 {
-                    string strLine=sReader.ReadLine();
-                    while (strLine!=null&& iLine < 10)
-                    {                     
-                        InputContents[iLine] = strLine;
-                        strLine = sReader.ReadLine();
-                        iLine++;
-                    }
-                }
-                else if (cbItem.Content.ToString() == "ProteinsFasta")
-                {
-                    int iProteins = 0;
-                    string strLine = sReader.ReadLine();
-                    while (strLine!=null && iLine < iReadLines)
-                    {
                         
-                        if (strLine!=""&& strLine[0] == '>')
-                        {
-                            iProteins++;
-                            if (iLine > 0)
-                                InputContents[iLine - 1] += "\n";
-                            if (iProteins == 11)
-                                break;
-                        }
-                         
-                        InputContents[iLine] = strLine;
-                        strLine = sReader.ReadLine(); 
-                        iLine++;
+                    if (strLine!=""&& strLine[0] == '>')
+                    {
+                        iProteins++;
+                        if (iLine > 0)
+                            InputContents[iLine - 1] += "\n";
+                        if (iProteins == 101)
+                            break;
                     }
+                         
+                    InputContents[iLine] = strLine;
+                    strLine = sReader.ReadLine(); 
+                    iLine++;
                 }
+
 
                 InputTextBox.Text = "";
                 for (int i = 0; i < iLine; i++)
@@ -255,12 +328,19 @@ namespace GUI_AP3
         {
             CheckParameters();
 
-            ComboBoxItem InputTypeItem=InputTypeComboBox.SelectedItem as ComboBoxItem;
             ComboBoxItem SpeciesItem = SpeciesComboBox.SelectedItem as ComboBoxItem;
             using (StreamWriter writer = File.CreateText(path))
             {
-                writer.WriteLine("InputFileType=\""+ InputTypeItem.Content.ToString()+ "\"");
-                writer.WriteLine("InputFilePath=\"" + InputFilePathTextBox.Text + "\"");
+                if(FileInputCheckbox.IsChecked==true)
+                {
+                    writer.WriteLine("InputFilePath=\"" + InputFilePathTextBox.Text + "\"");
+                }
+                else
+                {
+                    writer.WriteLine("InputFilePath=\".\\ScreenInputProteins.fasta\"");
+                    SaveScreenInputProteins("ScreenInputProteins.fasta");
+                }
+               
                 writer.WriteLine("Model=\"" + SpeciesItem.Content.ToString() + "\"");
                 writer.WriteLine("IdentifierParsingRule=\"" + ParseRuleTextBox.Text +"\"");
                 writer.WriteLine("ResultPath=\"" +ResultPathTextBox.Text +"\"");
@@ -273,6 +353,15 @@ namespace GUI_AP3
             return true;
         }
 
+        public void SaveScreenInputProteins(string strPath)
+        {
+            using (StreamWriter writer = File.CreateText(strPath))
+            {
+                writer.Write(InputTextBox.Text);
+                writer.Close();
+            }
+
+        }
         public bool CheckParameters()
         {
             if(ParseRuleTextBox.Text=="")
@@ -280,9 +369,15 @@ namespace GUI_AP3
                 System.Windows.MessageBox.Show("The regular expression for extract protein identifier from the protein fasta file is empty.");
                 return false;
             }
-            if (InputFilePathTextBox.Text == "")
+            if(FileInputCheckbox.IsChecked==true&&InputFilePathTextBox.Text=="")
             {
-                System.Windows.MessageBox.Show("The path of input file and the input sequences textbox is empty.");
+                System.Windows.MessageBox.Show("The path of the input file is empty.");
+                return false;
+            }
+
+            if (InputTextBox.Text == "")
+            {
+                System.Windows.MessageBox.Show("The input textbox is empty.");
                 return false;
             }
 
@@ -308,6 +403,9 @@ namespace GUI_AP3
                 return false;
             }
 
+            ComboBoxItem SpeciesItem = SpeciesComboBox.SelectedItem as ComboBoxItem;
+            if (SpeciesItem==null)
+                SpeciesComboBox.SelectedIndex = 0;
             return true;
         }
 
@@ -332,27 +430,19 @@ namespace GUI_AP3
             re.Owner = this;
             re.ShowDialog();
         }
+
         void SetCorrectRE(string text)
         {
             this.ParseRuleTextBox.Text = text;
         }
-        public string GetInputType()
+        public string GetInputPathFunction()
         {
-            ComboBoxItem InputTypeItem = InputTypeComboBox.SelectedItem as ComboBoxItem;
-            if (InputTypeItem.Content.ToString() == "ProteinsFasta")
-            {
-                return "ProteinsFasta";
-            }
-            else if(InputTypeItem.Content.ToString()=="PeptideSequences")
-            {
-                return "PeptideSequences";
-            }
+            if (this.InputFilePathTextBox.Text == "")
+                return "";
             else
-            {
-                return "null";
-            }
-        }
+                return this.InputFilePathTextBox.Text;
 
+        }
         private void AP3RunButton_click(object sender, RoutedEventArgs e)
         {
             if (!CheckParameters())
@@ -375,7 +465,12 @@ namespace GUI_AP3
             }
             strParameters[0] = strParametersPath;
             ///*************
-            StartProcess(strParameters);   
+            StartProcess(strParameters);
+
+
+
+
+   
         }
 
         public void StartProcess(string[] args)
@@ -395,9 +490,14 @@ namespace GUI_AP3
                 }
                 s = s.Trim();
 
-                DisableParameters();
+                
                 AP3Process = new Process();
-                string loadExeName = " PredictionOfRF31.exe";  //
+                string loadExeName = "PredictionOfRF31.exe";  //
+                if(!File.Exists(loadExeName))
+                {
+                    System.Windows.MessageBox.Show("Can not find the excutable file PredictionOfRF31.exe.");
+                    return;
+                }
 
                 ProcessStartInfo LoadStartInfo = new ProcessStartInfo(loadExeName, s);
                 LoadStartInfo.CreateNoWindow = true;
@@ -410,17 +510,14 @@ namespace GUI_AP3
                 AP3Process.Exited += new EventHandler(AP3Process_Exited);
                 AP3Process.StartInfo = LoadStartInfo;
                 bIfAP3Running = true;
+                 
+                UpdateStatusBar("AP3 is running!");
+                DoEvents();
+
+                DisableParameters();
                 AP3Process.Start();
-                AP3Process.WaitForExit();
-
-
-                if (AP3Process.ExitCode != 0)
-                {
-                    EnableParameters();
-                    return;
-                }
-
-
+                bIfRunAP3 = true;
+               // AP3Process.WaitForExit();
 
  
             }
@@ -488,14 +585,20 @@ new DelegateShowError(ShowError));
             }
             else
             {
-                //System.Windows.MessageBox.Show("Have loaded the input files!");
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
+new ChangeParamIsEnable(EnableParameters));
+
+                System.Windows.MessageBox.Show("AP3 has finished successfully!");
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
+new ChangeStatusBar(UpdateStatusBar), "Finished!");
+                DoEvents();
             }
             //throw new NotImplementedException();
         }
 
         private void UpdateStatusBar(String args)
         {
-            //statBarText.Text = args;  TODO
+            statBarText.Text = args;  
         }
         private void ShowError()
         {
@@ -546,6 +649,28 @@ new DelegateShowError(ShowError));
             }
 
             ShowInputSequences(InputFilePathTextBox.Text);
+        }
+
+        private void MaxMissCleavage_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string strTemp = MaxMissCleavage.Text;
+            if (!string.IsNullOrEmpty(strTemp))
+            {
+                try
+                {
+                    Int32 dTemp = Convert.ToInt32(strTemp);
+                    if (dTemp < 0 || dTemp > 5)
+                    {
+                        System.Windows.MessageBox.Show("The allowed maximum missing cleavages of one peptide in theoretic digestion should be in the 0-5 range");
+                        e.Handled = false;
+                    }
+                }
+                catch
+                {
+                    System.Windows.MessageBox.Show("The allowed maximum missing cleavages of one peptide in theoretic digestion should be a integer.");
+                }
+            }
+
         }
 
     }

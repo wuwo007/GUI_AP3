@@ -19,7 +19,7 @@ using System.Text.RegularExpressions;
 namespace GUI_AP3
 {
     public delegate void RetureREHandler(string text);
-    
+
 
     /// <summary>
     /// TestRegularExpression.xaml 的交互逻辑
@@ -35,19 +35,26 @@ namespace GUI_AP3
         public TestRegularExpression()
         {
             InitializeComponent();
-               try
+
+             try
             {
                 exams = new ObservableCollection<RegularExpressionExample>();
                 exams.Add(new RegularExpressionExample { header = ">IPI:IPI00107908.1|TREMBL:Q9D5E3|ENSEMBL:ENSMUSP00000106228|REFSEQ:NP_080412", re = ">(.*?)\\|", Identifier = "IPI:IPI00107908.1" });
                 exams.Add(new RegularExpressionExample { header = ">sp|P02768ups|ALBU_HUMAN_UPS Serum albumin (Chain 26-609) - Homo sapiens (Human)", re = ">sp\\|(.*?)\\|", Identifier = "P02768ups" });
                 exams.Add(new RegularExpressionExample { header = ">ENSP00000381386 pep:known chromosome:GRCh37:22:24313554:24316773:-1", re = ">(.*?)\\s", Identifier = "ENSP00000381386" });
                 examples.DataContext = exams;
-            }
+ 
+           }
             catch (IOException ex)
             { 
                 System.Windows.MessageBox.Show("An IOException has been thrown!"+ex.Message);
                 return;
             }
+             catch (ArgumentException ex)
+             {
+                 System.Windows.MessageBox.Show("Error:\t" + ex.Message);
+                 return;
+             }
 
         }
 

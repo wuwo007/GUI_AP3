@@ -1,0 +1,15 @@
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\bin\x64\Release\GUI_AP3.exe.config
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\bin\x64\Release\GUI_AP3.exe
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\bin\x64\Release\GUI_AP3.pdb
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\MainWindow.baml
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\TestRegularExpression.baml
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\MainWindow.g.cs
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\TestRegularExpression.g.cs
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\App.g.cs
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\GUI_AP3_MarkupCompile.cache
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\GUI_AP3.g.resources
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\GUI_AP3.Properties.Resources.resources
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\GUI_AP3.csproj.GenerateResource.Cache
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\GUI_AP3.exe
+G:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\GUI_AP3.pdb
+g:\InHouseSourceCode\AP3\GUI\GUI_AP3\GUI_AP3\obj\x64\Release\GUI_AP3.csprojResolveAssemblyReference.cache
